@@ -43,12 +43,14 @@ cp .env.example .env
 Заполните `OPENROUTER_API_KEY` реальным ключом OpenRouter:
 
 ```env
-OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_API_KEY=your_api_key
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 OPENROUTER_MODEL=openai/gpt-5-chat
 APP_NAME=team_ai_assistant
 APP_URL=http://localhost:3000
 REQUEST_TIMEOUT=60
+RATE_LIMIT_MAX_REQUESTS=30
+RATE_LIMIT_WINDOW_SECONDS=60
 ```
 
 Модель можно поменять без изменения кода: достаточно заменить `OPENROUTER_MODEL` в `backend/.env`.
@@ -112,7 +114,20 @@ cp .env.example .env.local
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_API_TIMEOUT_MS=70000
 ```
+
+`NEXT_PUBLIC_API_TIMEOUT_MS` задает клиентский timeout для зависших запросов. После timeout интерфейс покажет понятную ошибку и кнопку повторного запроса.
+
+## Обработка ошибок
+
+- backend валидирует входные данные и не возвращает traceback или API-ключи;
+- backend обрабатывает отсутствие OpenRouter API key, timeout, network error, ошибку OpenRouter, invalid JSON и пустой ответ;
+- backend добавляет `X-Request-ID` к ответам и пишет lifecycle-логи;
+- endpoint `POST /api/v1/ask` защищен простым in-memory rate limit;
+- frontend показывает понятные API-ошибки и кнопку `Повторить запрос`;
+- frontend прерывает зависшие запросы по timeout;
+- Next.js error boundaries показывают fallback UI при runtime crash страницы или приложения.
 
 ### Запуск frontend
 
