@@ -8,10 +8,16 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1.chat_router import router as chat_router
 from app.core.config import get_settings
+from app.middleware.rate_limit import InMemoryRateLimiter, rate_limit_middleware
+from app.middleware.request_context import request_context_middleware
 
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+rate_limiter = InMemoryRateLimiter(
+    max_requests=settings.rate_limit_max_requests,
+    window_seconds=settings.rate_limit_window_seconds,
+)
 
 app = FastAPI(title=settings.app_name, version="0.1.0")
 
@@ -32,6 +38,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def add_request_context(request: Request, call_next):
+    return await request_context_middleware(request, call_next)
+
+
+@app.middleware("http")
+async def protect_ai_endpoint(request: Request, call_next):
+    return await rate_limit_middleware(request, call_next, rate_limiter)
+
 
 app.include_router(chat_router)
 

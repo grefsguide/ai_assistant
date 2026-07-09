@@ -25,6 +25,7 @@ export function AiAssistantPanel() {
   const [selected_mode, set_selected_mode] = useState<AssistantMode>("general");
   const [is_loading, set_is_loading] = useState(false);
   const [error, set_error] = useState("");
+  const [can_retry, set_can_retry] = useState(false);
   const [history, set_history] = useState<string[]>([]);
   const [copied, set_copied] = useState(false);
 
@@ -41,16 +42,19 @@ export function AiAssistantPanel() {
 
     if (!cleaned_question) {
       set_error("Введите вопрос перед отправкой.");
+      set_can_retry(false);
       return;
     }
 
     if (cleaned_question.length > max_question_length) {
       set_error("Вопрос слишком длинный. Максимум 5 000 символов.");
+      set_can_retry(false);
       return;
     }
 
     set_is_loading(true);
     set_error("");
+    set_can_retry(false);
     set_copied(false);
 
     try {
@@ -60,10 +64,12 @@ export function AiAssistantPanel() {
       set_model(response.model);
       set_request_id(response.request_id);
       set_history(add_question_to_history(cleaned_question));
+      set_can_retry(false);
     } catch (caught_error) {
       set_answer("");
       set_model("");
       set_request_id("");
+      set_can_retry(true);
       set_error(
         caught_error instanceof Error
           ? caught_error.message
@@ -77,6 +83,13 @@ export function AiAssistantPanel() {
   function handle_select_question(selected_question: string) {
     set_question(selected_question);
     set_error("");
+    set_can_retry(false);
+  }
+
+  function handle_mode_change(next_mode: AssistantMode) {
+    set_selected_mode(next_mode);
+    set_error("");
+    set_can_retry(false);
   }
 
   async function handle_copy_answer() {
@@ -93,6 +106,7 @@ export function AiAssistantPanel() {
       window.setTimeout(() => set_copied(false), 1800);
     } catch {
       set_error("Не удалось скопировать ответ. Попробуйте вручную выделить текст.");
+      set_can_retry(false);
     }
   }
 
@@ -106,12 +120,17 @@ export function AiAssistantPanel() {
             is_loading={is_loading}
             max_length={max_question_length}
             on_question_change={set_question}
-            on_mode_change={set_selected_mode}
+            on_mode_change={handle_mode_change}
             on_submit={handle_submit}
           />
         </div>
 
-        <ErrorMessage message={error} />
+        <ErrorMessage
+          message={error}
+          action_label={can_retry ? "Повторить запрос" : undefined}
+          is_action_disabled={is_loading}
+          on_action={can_retry ? handle_submit : undefined}
+        />
 
         {is_loading ? (
           <LoadingState />

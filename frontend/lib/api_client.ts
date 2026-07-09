@@ -7,6 +7,18 @@ import type {
 
 
 const api_base_url = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+const default_api_timeout_ms = 70000;
+
+
+function get_api_timeout_ms(): number {
+  const timeout = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS);
+
+  if (!Number.isFinite(timeout) || timeout <= 0) {
+    return default_api_timeout_ms;
+  }
+
+  return timeout;
+}
 
 
 class AssistantApiError extends Error {
@@ -45,6 +57,9 @@ export async function ask_ai(
   mode: AssistantMode,
 ): Promise<AskResponse> {
   const request_body: AskRequest = { question, mode };
+  const abort_controller = new AbortController();
+  const timeout_ms = get_api_timeout_ms();
+  const timeout_id = setTimeout(() => abort_controller.abort(), timeout_ms);
 
   try {
     const response = await fetch(`${api_base_url}/api/v1/ask`, {
@@ -53,6 +68,7 @@ export async function ask_ai(
         "Content-Type": "application/json",
       },
       body: JSON.stringify(request_body),
+      signal: abort_controller.signal,
     });
 
     const data = await parse_response(response);
@@ -77,6 +93,12 @@ export async function ask_ai(
       throw error;
     }
 
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Backend слишком долго не отвечает. Попробуйте повторить запрос.");
+    }
+
     throw new Error("Не удалось связаться с backend. Проверьте, что сервер запущен.");
+  } finally {
+    clearTimeout(timeout_id);
   }
 }

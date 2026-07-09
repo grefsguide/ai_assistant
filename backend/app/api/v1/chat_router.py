@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from app.schemas.chat_schema import AskRequest, AskResponse
 from app.services.openrouter_client import (
@@ -18,11 +18,17 @@ router = APIRouter(prefix="/api/v1", tags=["chat"])
 
 
 @router.post("/ask", response_model=AskResponse)
-async def ask_ai(payload: AskRequest) -> AskResponse:
-    request_id = create_request_id()
+async def ask_ai(payload: AskRequest, request: Request) -> AskResponse:
+    request_id = getattr(request.state, "request_id", None) or create_request_id()
     client = OpenRouterClient()
 
     try:
+        logger.info(
+            "AI request started: request_id=%s mode=%s question_length=%s",
+            request_id,
+            payload.mode,
+            len(payload.question),
+        )
         result = await client.ask(payload.question, request_id, payload.mode)
     except MissingApiKeyError:
         logger.error("OpenRouter API key is missing: request_id=%s", request_id)
@@ -51,6 +57,13 @@ async def ask_ai(payload: AskRequest) -> AskResponse:
             status_code=500,
             detail="Произошла непредвиденная ошибка. Попробуйте позже.",
         ) from None
+
+    logger.info(
+        "AI request completed: request_id=%s mode=%s model=%s",
+        request_id,
+        payload.mode,
+        result.model,
+    )
 
     return AskResponse(
         answer=result.answer,

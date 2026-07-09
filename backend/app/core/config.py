@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     app_name: str = Field(default="team_ai_assistant")
     app_url: str = Field(default="http://localhost:3000")
     request_timeout: float = Field(default=60, gt=0)
+    rate_limit_max_requests: int = Field(default=30, ge=1)
+    rate_limit_window_seconds: int = Field(default=60, ge=1)
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
