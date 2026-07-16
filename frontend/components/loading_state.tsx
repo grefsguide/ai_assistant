@@ -5,8 +5,8 @@ import { Loader2 } from "lucide-react";
 
 export function LoadingState() {
   return (
-    <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-      <div className="mb-5 flex items-center justify-between gap-4">
+    <section className="min-w-0 overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="mb-5 flex min-w-0 items-center justify-between gap-4">
         <h2 className="text-lg font-semibold text-zinc-950">Ответ AI</h2>
         <div className="inline-flex items-center gap-2 text-sm font-medium text-emerald-700">
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

@@ -23,6 +23,7 @@ export function AiAssistantPanel() {
   const [model, set_model] = useState("");
   const [request_id, set_request_id] = useState("");
   const [selected_mode, set_selected_mode] = useState<AssistantMode>("general");
+  const [answer_mode, set_answer_mode] = useState<AssistantMode>("general");
   const [is_loading, set_is_loading] = useState(false);
   const [error, set_error] = useState("");
   const [can_retry, set_can_retry] = useState(false);
@@ -63,6 +64,7 @@ export function AiAssistantPanel() {
       set_answer(response.answer);
       set_model(response.model);
       set_request_id(response.request_id);
+      set_answer_mode(selected_mode);
       set_history(add_question_to_history(cleaned_question));
       set_can_retry(false);
     } catch (caught_error) {
@@ -99,7 +101,7 @@ export function AiAssistantPanel() {
 
     try {
       const copied_answer =
-        selected_mode === "code" ? get_plain_code_answer(answer) : answer;
+        answer_mode === "code" ? get_plain_code_answer(answer) : answer;
 
       await navigator.clipboard.writeText(copied_answer);
       set_copied(true);
@@ -111,9 +113,9 @@ export function AiAssistantPanel() {
   }
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-      <div className="space-y-5">
-        <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <section className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
+      <div className="min-w-0 space-y-5">
+        <div className="min-w-0 overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
           <QuestionInput
             question={question}
             selected_mode={selected_mode}
@@ -139,7 +141,7 @@ export function AiAssistantPanel() {
             answer={answer}
             model={model}
             request_id={request_id}
-            mode={selected_mode}
+            mode={answer_mode}
             actions={
               <CopyAnswerButton
                 answer={answer}

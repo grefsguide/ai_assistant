@@ -12,13 +12,43 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background: #f7f7f4;
   color: #18181b;
+}
+
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
+}
+
+.katex {
+  max-width: 100%;
+}
+
+.prose p,
+.prose li {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.prose p:has(.katex),
+.prose li:has(.katex) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
+}
+
+.prose .katex-html {
+  max-width: 100%;
 }
 
 button,

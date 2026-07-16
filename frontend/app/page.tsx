@@ -3,9 +3,9 @@ import { AiAssistantPanel } from "@/components/ai_assistant_panel";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#f7f7f4] px-4 py-6 text-zinc-950 sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-        <header className="border-b border-zinc-200 pb-6">
+    <main className="min-h-screen overflow-x-hidden bg-[#f7f7f4] px-4 py-6 text-zinc-950 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full min-w-0 max-w-6xl flex-col gap-8">
+        <header className="min-w-0 border-b border-zinc-200 pb-6">
           <p className="mb-2 text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
             Internal AI
           </p>

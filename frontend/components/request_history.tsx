@@ -14,10 +14,10 @@ export function RequestHistory({
   on_select_question,
 }: RequestHistoryProps) {
   return (
-    <aside className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center gap-2">
+    <aside className="min-w-0 overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex min-w-0 items-center gap-2">
         <History className="h-5 w-5 text-emerald-700" aria-hidden="true" />
-        <h2 className="text-lg font-semibold text-zinc-950">
+        <h2 className="min-w-0 text-lg font-semibold text-zinc-950">
           Последние вопросы
         </h2>
       </div>
@@ -29,7 +29,7 @@ export function RequestHistory({
               key={item}
               type="button"
               onClick={() => on_select_question(item)}
-              className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-left text-sm leading-6 text-zinc-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-zinc-950 focus:outline-none focus:ring-4 focus:ring-emerald-100"
+              className="w-full min-w-0 break-words rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-left text-sm leading-6 text-zinc-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-zinc-950 focus:outline-none focus:ring-4 focus:ring-emerald-100"
             >
               {item}
             </button>
